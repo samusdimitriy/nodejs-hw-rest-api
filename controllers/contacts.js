@@ -6,6 +6,7 @@ const schemas = require("../schemas/contacts");
 const listContacts = async (req, res) => {
   const result = await Contact.find();
   res.status(200).json(result);
+  console.log(result);
 };
 
 const getContactById = async (req, res) => {

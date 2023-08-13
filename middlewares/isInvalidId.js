@@ -5,8 +5,9 @@ const isValidId = (req, res, next) => {
   const { id } = req.params;
   if (!isValidObjectId(id)) {
     next(HttpError(404, `${id} is not valid id`));
+  } else {
+    next();
   }
-  next();
 };
 
 module.exports = isValidId;
