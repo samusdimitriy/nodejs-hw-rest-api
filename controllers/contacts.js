@@ -1,10 +1,10 @@
 const HttpError = require("../helpers/HttpError");
 const ctrlWrapper = require("../helpers/ctrlWrapper");
 
-const { Contact } = require("../models/contacts");
+const Contact = require("../models/contacts");
 
 const listContacts = async (req, res) => {
-  const result = await Contact.find({}, "_createdAt -updatedAt");
+  const result = await Contact.find();
   res.status(200).json(result);
 };
 

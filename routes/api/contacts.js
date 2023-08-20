@@ -5,10 +5,10 @@ const ctrl = require("../../controllers/contacts");
 const { isValidId } = require("../../middlewares");
 
 const { validateBody } = require("../../middlewares");
-
+//
 const router = express.Router();
 
-const schemas = require("../../models/contact");
+const schemas = require("../../schemas/contacts");
 
 router.get("/", ctrl.listContacts);
 
