@@ -5,6 +5,9 @@ const ctrl = require("../../controllers/contacts");
 const { isValidId } = require("../../middlewares");
 
 const { validateBody } = require("../../middlewares");
+
+const checkBody = require("../../middlewares/checkBody");
+
 //
 const router = express.Router();
 
@@ -28,6 +31,7 @@ router.put(
 router.patch(
   "/:id/favorite",
   isValidId,
+  checkBody,
   validateBody(schemas.updateFavoriteSchema),
   ctrl.updateStatusContact
 );
