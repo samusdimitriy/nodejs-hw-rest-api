@@ -3,7 +3,8 @@ const bcrypt = require("bcrypt");
 const { User } = require("../models/user");
 const jwt = require("jsonwebtoken");
 
-const { HttpError, ctrlWrapper } = require("../helpers");
+const HttpError = require("../helpers/HttpError");
+const ctrlWrapper = require("../helpers/ctrlWrapper");
 require("dotenv").config();
 const { SECRET_KEY } = process.env;
 
@@ -12,7 +13,7 @@ const register = async (req, res) => {
 
   const user = await User.findOne({ email });
   if (user) {
-    throw new HttpError(409, "Email in use");
+    throw HttpError(409, "Email in use");
   }
 
   const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
