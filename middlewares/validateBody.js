@@ -4,7 +4,11 @@ const validateBody = (schema) => {
   const func = (req, res, next) => {
     const { error } = schema.validate(req.body);
     if (error) {
-      next(HttpError(400, error.message));
+      if (error.details[0].type === "string.pattern.base") {
+        throw HttpError(401, "Email or password is wrong");
+      } else {
+        throw HttpError(400, error.message);
+      }
     }
     next();
   };
