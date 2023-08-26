@@ -4,14 +4,13 @@ const ctrlWrapper = require("../helpers/ctrlWrapper");
 const Contact = require("../models/contacts");
 
 const listContacts = async (req, res) => {
-  const result = await Contact.find({});
-  console.log(result);
+  const result = await Contact.find({}, "-createdAt -updatedAt");
   res.status(200).json(result);
 };
 
 const getContactById = async (req, res) => {
   const { id } = req.params;
-  const result = await Contact.findById(id);
+  const result = await Contact.findById(id, "-createdAt -updatedAt");
   if (!result) {
     throw HttpError(404, "Not found");
   }
@@ -20,23 +19,25 @@ const getContactById = async (req, res) => {
 
 const addContact = async (req, res) => {
   const result = await Contact.create(req.body);
-  res.status(201).json(result);
+  const { createdAt, updatedAt, ...contactData } = result.toObject();
+  res.status(201).json(contactData);
 };
 
 const updateContact = async (req, res) => {
   const { id } = req.params;
-
   const result = await Contact.findByIdAndUpdate(id, req.body, { new: true });
+
   if (!result) {
     throw HttpError(404, "Not Found");
   }
-  res.status(200).json(result);
+
+  const { createdAt, updatedAt, ...updatedContact } = result.toObject();
+  res.status(200).json(updatedContact);
 };
 
 const updateStatusContact = async (req, res) => {
   const { id } = req.params;
   const { favorite } = req.body;
-
   const result = await Contact.findByIdAndUpdate(
     id,
     { favorite },
@@ -46,7 +47,9 @@ const updateStatusContact = async (req, res) => {
   if (!result) {
     throw HttpError(404, "Not found");
   }
-  res.status(200).json(result);
+
+  const { createdAt, updatedAt, ...updatedContact } = result.toObject();
+  res.status(200).json(updatedContact);
 };
 
 const removeContact = async (req, res) => {
@@ -55,7 +58,7 @@ const removeContact = async (req, res) => {
   if (!result) {
     throw HttpError(404, "Not found");
   }
-  res.status(200).json({ message: "contact has been successfully deleted" });
+  res.status(200).json({ message: "contact deleted" });
 };
 
 module.exports = {
