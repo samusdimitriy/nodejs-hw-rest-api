@@ -25,12 +25,14 @@ router.post(
   ctrl.addContact
 );
 
+
 router.delete("/:id", authenticate, isValidId, ctrl.removeContact);
 
 router.put(
   "/:id",
   authenticate,
   isValidId,
+  checkBody,
   validateBody(schemas.addSchema),
   ctrl.updateContact
 );
@@ -38,7 +40,6 @@ router.put(
 router.patch(
   "/:id/favorite",
   isValidId,
-  checkBody,
   validateBody(schemas.updateFavoriteSchema),
   ctrl.updateStatusContact
 );
