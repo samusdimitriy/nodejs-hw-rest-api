@@ -1,12 +1,18 @@
 const bcrypt = require("bcrypt");
+const Jimp = require("jimp");
 
 const { User } = require("../models/user");
 const jwt = require("jsonwebtoken");
+const path = require("path");
+const fs = require("fs/promises");
+const gravatar = require("gravatar");
 
 const HttpError = require("../helpers/HttpError");
 const ctrlWrapper = require("../helpers/ctrlWrapper");
 require("dotenv").config();
 const { SECRET_KEY } = process.env;
+
+const avatarsDir = path.join(__dirname, "../", "public", "avatars");
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -17,7 +23,14 @@ const register = async (req, res) => {
   }
 
   const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-  const newUser = new User({ email, password: hashPassword });
+
+  const avatarURL = gravatar.url(email);
+
+  const newUser = new User({
+    email,
+    password: hashPassword,
+    avatarURL,
+  });
   await newUser.save();
 
   res.status(201).json({
@@ -32,7 +45,6 @@ const login = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (!user) {
-    console.log("user");
     throw HttpError(401, "Email or password is wrong");
   }
   const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -74,10 +86,30 @@ const updateSubscription = async (req, res) => {
   });
 };
 
+const updateAvatar = async (req, res) => {
+  const { _id } = req.user;
+  const { path: tempUpload, originalname } = req.file;
+  const img = await Jimp.read(tempUpload);
+  await img
+    .autocrop()
+    .cover(250, 250, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE)
+    .writeAsync(tempUpload);
+
+  const fileName = `${_id}_${originalname}`;
+  const resultUpload = path.join(avatarsDir, fileName);
+  await fs.rename(tempUpload, resultUpload);
+  const avatarURL = path.join("/avatars", fileName);
+  await User.findByIdAndUpdate(_id, { avatarURL });
+  res.json({
+    avatarURL,
+  });
+};
+
 module.exports = {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(current),
   logout: ctrlWrapper(logout),
   updateSubscription: ctrlWrapper(updateSubscription),
+  updateAvatar: ctrlWrapper(updateAvatar),
 };
