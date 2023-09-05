@@ -13,6 +13,7 @@ router.post(
   ctrl.register
 );
 router.post("/login", checkBody, validateBody(schemas.loginSchema), ctrl.login);
+router.get("/verify/:verificationToken", ctrl.verify);
 router.post("/logout", authenticate, ctrl.logout);
 router.get("/current", authenticate, ctrl.getCurrent);
 router.patch("/", authenticate, ctrl.updateSubscription);
