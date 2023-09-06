@@ -2,17 +2,16 @@ const express = require("express");
 
 const ctrl = require("../../controllers/contacts");
 
-const { isValidId } = require("../../middlewares");
+const {
+  isValidId,
+  validateBody,
+  authenticate,
+  checkBody,
+} = require("../../middlewares");
 
-const { validateBody } = require("../../middlewares");
-
-const checkBody = require("../../middlewares/checkBody");
-
-//
 const router = express.Router();
 
 const { schemas } = require("../../models/contacts");
-const authenticate = require("../../middlewares/authenticate");
 
 router.get("/", authenticate, ctrl.listContacts);
 
@@ -24,7 +23,6 @@ router.post(
   validateBody(schemas.addSchema),
   ctrl.addContact
 );
-
 
 router.delete("/:id", authenticate, isValidId, ctrl.removeContact);
 
