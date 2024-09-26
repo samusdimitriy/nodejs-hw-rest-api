@@ -1,9 +1,11 @@
 const express = require("express");
 const ctrl = require("../../controllers/auth");
-const validateBody = require("../../middlewares/validateBody");
-const checkBody = require("../../middlewares/checkBody");
-const authenticate = require("../../middlewares/authenticate");
-const upload = require("../../middlewares/upload");
+const {
+  authenticate,
+  checkBody,
+  upload,
+  validateBody,
+} = require("../../middlewares");
 const { schemas } = require("../../models/user");
 const router = express.Router();
 
@@ -14,7 +16,13 @@ router.post(
   ctrl.register
 );
 router.post("/login", checkBody, validateBody(schemas.loginSchema), ctrl.login);
-router.get("/verify/:verificationToken", ctrl.verify);
+router.get("/verify/:verificationToken", ctrl.verifyEmail);
+router.post(
+  "/verify",
+  validateBody(schemas.emailSchema),
+  ctrl.resendVerifyEmail
+);
+
 router.post("/logout", authenticate, ctrl.logout);
 router.get("/current", authenticate, ctrl.getCurrent);
 router.patch("/", authenticate, ctrl.updateSubscription);
